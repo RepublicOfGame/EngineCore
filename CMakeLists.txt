@@ -3,4 +3,8 @@ project(EngineCore)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(EngineCore main.cpp)
+file(GLOB_RECURSE CPP_SOURCES RELATIVE ${CMAKE_SOURCE_DIR}
+        "Application/*.cpp"
+        "Core/*.cpp")
+
+add_executable(EngineCore ${CPP_SOURCES})
