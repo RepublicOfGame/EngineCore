@@ -23,7 +23,9 @@ FetchContent_Declare(
         GIT_TAG        release-2.1.12-stable
         GIT_SHALLOW    TRUE
 )
-FetchContent_MakeAvailable(Libevent)
-FetchContent_GetProperties(Libevent)
+FetchContent_MakeAvailable(libevent)
+
+include_directories(${libevent_SOURCE_DIR}/include/)
+include_directories(${libevent_BINARY_DIR}/include/)
 
 add_executable(EngineCore ${CPP_SOURCES})

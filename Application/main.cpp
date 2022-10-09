@@ -1,9 +1,9 @@
 //
 // Created by bytedance on 2022/10/9.
 //
-#include <iostream>
+#include "event2/event.h"
 
 int main(){
-    std::cout << "OK" << std::endl;
+
     return 0;
 }
