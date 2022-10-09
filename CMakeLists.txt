@@ -7,6 +7,9 @@ set(CMAKE_CXX_STANDARD 20)
 file(GLOB_RECURSE CPP_SOURCES RELATIVE ${CMAKE_SOURCE_DIR}
         "Application/*.cpp"
         "Core/*.cpp")
+
+include_directories(${CMAKE_SOURCE_DIR}/Core/Util/Public)
+
 # OpenSSL
 IF(WIN32)
     MESSAGE(WARNING "windows 下自行配置 openssl")
@@ -23,9 +26,19 @@ FetchContent_Declare(
         GIT_TAG        release-2.1.12-stable
         GIT_SHALLOW    TRUE
 )
-FetchContent_MakeAvailable(libevent)
+# spdlog 日志库
+FetchContent_Declare(
+        spdlog
+        GIT_REPOSITORY https://github.com/gabime/spdlog.git
+        GIT_TAG        v1.x
+        GIT_SHALLOW    TRUE
+)
+FetchContent_MakeAvailable(libevent spdlog)
 
 include_directories(${libevent_SOURCE_DIR}/include/)
 include_directories(${libevent_BINARY_DIR}/include/)
+
+include_directories(${spdlog_SOURCE_DIR}/include/)
+
 
 add_executable(EngineCore ${CPP_SOURCES})
