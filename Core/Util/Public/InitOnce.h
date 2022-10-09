@@ -13,4 +13,4 @@ namespace Util{
 }
 
 #define CONCAT(a,b) a##b
-#define InitOnce(Func) static Util::Once<typeof(Func)> CONCAT(OnceVar, __COUNTER__) (Func)
+#define InitOnce(Func) static Util::Once<typeof(Func)> __OnceVar (Func)

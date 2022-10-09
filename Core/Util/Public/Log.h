@@ -13,5 +13,3 @@ namespace Util{
         spdlog::set_pattern("[%^%l%$] [%s:%#] [%H:%M:%S.%e] %v");
     }
 }
-
-InitOnce(Util::InitLog);
