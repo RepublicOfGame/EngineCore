@@ -8,7 +8,10 @@ file(GLOB_RECURSE CPP_SOURCES RELATIVE ${CMAKE_SOURCE_DIR}
         "Application/*.cpp"
         "Core/*.cpp")
 
-include_directories(${CMAKE_SOURCE_DIR}/Core/Util/Public)
+include_directories(
+        ${CMAKE_SOURCE_DIR}/Core/Util/Public
+        ${CMAKE_SOURCE_DIR}/Core/Net/Public
+)
 
 # OpenSSL
 IF(WIN32)
@@ -33,7 +36,14 @@ FetchContent_Declare(
         GIT_TAG        v1.x
         GIT_SHALLOW    TRUE
 )
-FetchContent_MakeAvailable(libevent spdlog)
+# Googletest
+FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG release-1.12.1
+)
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(libevent spdlog googletest)
 
 include_directories(${libevent_SOURCE_DIR}/include/)
 include_directories(${libevent_BINARY_DIR}/include/)
@@ -42,3 +52,14 @@ include_directories(${spdlog_SOURCE_DIR}/include/)
 
 
 add_executable(EngineCore ${CPP_SOURCES})
+
+# Unit Test
+file(GLOB_RECURSE CPP_TEST_SOURCES RELATIVE ${CMAKE_SOURCE_DIR}
+        "Test/*.cpp")
+
+add_executable(EngineTest ${CPP_TEST_SOURCES})
+target_link_libraries(EngineTest GTest::gtest_main)
+enable_testing()
+
+include(GoogleTest)
+gtest_discover_tests(EngineTest)

@@ -3,10 +3,10 @@
 #include "spdlog/spdlog.h"
 #include "InitOnce.h"
 
-#define ERROR SPDLOG_ERROR
-#define INFO SPDLOG_INFO
-#define WARN SPDLOG_WARN
-#define DEBUG SPDLOG_DEBUG
+#define Loge SPDLOG_ERROR
+#define Logi SPDLOG_INFO
+#define Logw SPDLOG_WARN
+#define Logd SPDLOG_DEBUG
 
 namespace Util{
     static void InitLog(){
