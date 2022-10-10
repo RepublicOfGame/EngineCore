@@ -1,6 +1,5 @@
 #pragma once
 
-
 namespace Util{
     typedef void(*OnceFunc)();
 
@@ -12,5 +11,4 @@ namespace Util{
     };
 }
 
-#define CONCAT(a,b) a##b
-#define InitOnce(Func) static Util::Once<typeof(Func)> __OnceVar (Func)
+#define InitOnce(Func) const static Util::Once __OnceVar (Func)
