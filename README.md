@@ -8,7 +8,7 @@
 ├── Core                      引擎核心
 │   └── Net                   网络通信层
 │   └── Serialization         序列化
-├── CompilerPlugin            Clang 编译器插件
+├── CompilerExtensions            Clang 编译器插件
 ├── Test                      单元测试
 ```
 

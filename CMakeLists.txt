@@ -4,15 +4,17 @@ include(FetchContent)
 
 set(CMAKE_CXX_STANDARD 20)
 #add_compile_options(-v)
+add_compile_definitions(ENGINE_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
 
 file(GLOB_RECURSE CPP_SOURCES RELATIVE ${CMAKE_SOURCE_DIR}
         "Application/*.cpp"
         "Core/*.cpp")
 
 include_directories(
-        ${CMAKE_SOURCE_DIR}/Core/Util/Public
         ${CMAKE_SOURCE_DIR}/Core/Net/Public
+        ${CMAKE_SOURCE_DIR}/Util/Public
 )
+
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 
 # OpenSSL
@@ -51,6 +53,7 @@ include_directories(${libevent_SOURCE_DIR}/include/)
 include_directories(${libevent_BINARY_DIR}/include/)
 include_directories(${spdlog_SOURCE_DIR}/include/)
 
+add_subdirectory(Util)
 
 # LLVM
 SET(LLVM_DIR /usr/local/Cellar/llvm/13.0.0_1/lib/cmake/llvm)
@@ -73,16 +76,12 @@ message("LLVM STATUS:
 include_directories(SYSTEM ${LLVM_INCLUDE_DIRS} ${CLANG_INCLUDE_DIRS})
 link_directories(${LLVM_LIBRARY_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
-llvm_map_components_to_libnames(llvm_libs support)
-list(APPEND clang_libs clangBasic clangAST clangFrontend clangLex)
 
-# Compiler Plugin
-add_subdirectory(CompilerPlugin)
+# Compiler Extensions
+add_subdirectory(CompilerExtensions)
 
 # 主程序
 add_executable(EngineCore ${CPP_SOURCES})
-add_dependencies(EngineCore TestPlugin)
-target_compile_options(EngineCore PRIVATE -fplugin=${PROJECT_BINARY_DIR}/lib/libTestPlugin.dylib)
 
 # Unit Test
 file(GLOB_RECURSE CPP_TEST_SOURCES RELATIVE ${CMAKE_SOURCE_DIR}
