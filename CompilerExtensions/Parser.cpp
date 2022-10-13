@@ -30,12 +30,16 @@ void ParseSourceCode(const std::string &filepath, ClangAstConsumer *consumer) {
     }
 }
 
-void ClangAstConsumer::OnIndexDeclaration(const CXIdxDeclInfo *info) {
-    const CXIdxCXXClassDeclInfo *classInfo = clang_index_getCXXClassDeclInfo(info);
-    if (classInfo == nullptr) return;
+void ClangAstConsumer::OnIndexDeclaration(const CXIdxDeclInfo *declInfo) {
+    if (const CXIdxCXXClassDeclInfo *classInfo = clang_index_getCXXClassDeclInfo(declInfo))
+        this->OnDeclClass(classInfo);
+    else if (clang_getCursorKind(declInfo->cursor) == CXCursor_FieldDecl && clang_Cursor_hasAttrs(declInfo->cursor))
+        this->OnDeclField(declInfo);
+}
 
+void ReflectionInfoCollector::OnDeclClass(const CXIdxCXXClassDeclInfo *classInfo) {
     printf("ClassName: %-20s", classInfo->declInfo->entityInfo->name);
-    for (int i = 0; i != classInfo->numBases; ++i) {
+    for (unsigned i = 0; i != classInfo->numBases; ++i) {
         if (!i) printf("Base: ");
         if (clang_isVirtualBase(classInfo->bases[i]->cursor)) {
             printf("virtual ");
@@ -43,4 +47,31 @@ void ClangAstConsumer::OnIndexDeclaration(const CXIdxDeclInfo *info) {
         printf("%-20s", classInfo->bases[i]->base->name);
     }
     printf("\n");
+}
+
+void ReflectionInfoCollector::OnDeclField(const CXIdxDeclInfo *declInfo) {
+    if (HasReflectionAttribute(declInfo)) {
+        CXString S = clang_getTypeSpelling(GetType(declInfo->cursor));
+        printf("Type: %-20s Name: %-20s", clang_getCString(S), declInfo->entityInfo->name);
+        clang_disposeString(S);
+    }
+}
+
+bool ReflectionInfoCollector::HasReflectionAttribute(const CXIdxDeclInfo *declInfo) {
+    for (unsigned i = 0; i < declInfo->numAttributes; i++) {
+        CXString S = clang_getCursorSpelling(declInfo->attributes[i]->cursor);
+        int cmp = strcmp(clang_getCString(S), ReflectionInfoCollector::AttributeReflection);
+        clang_disposeString(S);
+        if (cmp == 0)
+            return true;
+    }
+    return false;
+}
+
+CXType ReflectionInfoCollector::GetType(const CXCursor cursor) {
+    CXType type = clang_getCursorType(cursor);
+    while (type.kind == CXType_Typedef) {
+        type = clang_getTypedefDeclUnderlyingType(clang_getTypeDeclaration(type));
+    };
+    return type;
 }

@@ -7,7 +7,7 @@ class SuerBase {
     int q;
 };
 
-class MyBaseClass1 : SuerBase {
+class MyBaseClass1 : virtual SuerBase {
     int aa;
 };
 
@@ -15,7 +15,7 @@ class MyBaseClass2 : virtual SuerBase {
     int bb;
 };
 
-class MyClass : MyBaseClass1, virtual MyBaseClass2 {
+class MyClass : virtual MyBaseClass1, virtual MyBaseClass2 {
 public:
     Refl MyType2 testField;
 

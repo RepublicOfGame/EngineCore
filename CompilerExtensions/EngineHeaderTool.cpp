@@ -2,7 +2,7 @@
 #include "Parser.h"
 
 int main() {
-    auto consumer = std::make_shared<ClangAstConsumer>();
+    auto consumer = std::make_shared<ReflectionInfoCollector>();
     ParseSourceCode(ENGINE_SOURCE_DIR"/CompilerExtensions/play.cpp", consumer.get());
 }
 
