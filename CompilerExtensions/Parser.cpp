@@ -1,11 +1,10 @@
-#include <clang-c/Index.h>
 #include "Parser.h"
 #include "Log.h"
 #include <memory>
 
 static IndexerCallbacks cb;
 
-void NewClangAst(const std::string &filepath, ClangAstConsumer *consumer) {
+void ParseSourceCode(const std::string &filepath, ClangAstConsumer *consumer) {
     CXIndex index = clang_createIndex(0, 0);
     CXTranslationUnit TU = clang_parseTranslationUnit(
             index,
@@ -31,7 +30,14 @@ void NewClangAst(const std::string &filepath, ClangAstConsumer *consumer) {
     }
 }
 
-ClangAstConsumer::ClangAstConsumer()
-        : ContextPtr(std::make_shared<ParserContext>()) {
+void ClangAstConsumer::OnIndexDeclaration(const CXIdxDeclInfo *info) {
+    const CXIdxCXXClassDeclInfo *classInfo = clang_index_getCXXClassDeclInfo(info);
+    if (classInfo == nullptr) return;
 
+    printf("ClassName: %-20s", classInfo->declInfo->entityInfo->name);
+    for (int i = 0; i != classInfo->numBases; ++i) {
+        if (!i) printf("Base: ");
+        printf("%-20s", classInfo->bases[i]->base->name);
+    }
+    printf("\n");
 }
