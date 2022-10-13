@@ -37,6 +37,9 @@ void ClangAstConsumer::OnIndexDeclaration(const CXIdxDeclInfo *info) {
     printf("ClassName: %-20s", classInfo->declInfo->entityInfo->name);
     for (int i = 0; i != classInfo->numBases; ++i) {
         if (!i) printf("Base: ");
+        if (clang_isVirtualBase(classInfo->bases[i]->cursor)) {
+            printf("virtual ");
+        }
         printf("%-20s", classInfo->bases[i]->base->name);
     }
     printf("\n");
