@@ -3,7 +3,7 @@
 #include <clang-c/Index.h>
 #include <string>
 #include <memory>
-
+#include "ResourceID.h"
 
 class ClangAstConsumer {
 public:
@@ -19,7 +19,7 @@ public:
 
 class ReflectionInfoCollector : public ClangAstConsumer {
 public:
-    constexpr static char AttributeReflection[] = "reflect";
+    static constexpr const char *AnnotationReflect = "reflect";
 
     void OnDeclClass(const CXIdxCXXClassDeclInfo *ptr) override;
 
@@ -27,7 +27,11 @@ public:
 
     static bool HasReflectionAttribute(const CXIdxDeclInfo *declInfo);
 
-    static CXType GetType(const CXCursor);
+    static CXType GetUnderlyingType(const CXCursor &cursor);
+};
+
+enum Annotation {
+    Reflect = StringToRID(ReflectionInfoCollector::AnnotationReflect)
 };
 
 extern void ParseSourceCode(const std::string &filepath, ClangAstConsumer *consumer);

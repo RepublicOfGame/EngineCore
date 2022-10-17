@@ -4,19 +4,20 @@ typedef int MyType1;
 typedef MyType1 MyType2;
 
 class SuerBase {
-    int q;
+    Refl int q;
 };
 
-class MyBaseClass1 : virtual SuerBase {
-    int aa;
+class MyBaseClass1 : SuerBase {
+    Refl int aa;
 };
 
-class MyBaseClass2 : virtual SuerBase {
+class MyBaseClass2 : SuerBase {
     int bb;
 };
 
-class MyClass : virtual MyBaseClass1, virtual MyBaseClass2 {
+class MyClass : MyBaseClass1 {
 public:
+    Refl int a = 0;
     Refl MyType2 testField;
 
     MyClass() {}

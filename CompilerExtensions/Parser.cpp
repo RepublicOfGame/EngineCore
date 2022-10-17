@@ -51,8 +51,9 @@ void ReflectionInfoCollector::OnDeclClass(const CXIdxCXXClassDeclInfo *classInfo
 
 void ReflectionInfoCollector::OnDeclField(const CXIdxDeclInfo *declInfo) {
     if (HasReflectionAttribute(declInfo)) {
-        CXString S = clang_getTypeSpelling(GetType(declInfo->cursor));
-        printf("Type: %-20s Name: %-20s", clang_getCString(S), declInfo->entityInfo->name);
+        auto offset = clang_Cursor_getOffsetOfField(declInfo->cursor) / 8;
+        CXString S = clang_getTypeSpelling(GetUnderlyingType(declInfo->cursor));
+        printf("Type: %-10s Name: %-10s Offset: %-10lld\n", clang_getCString(S), declInfo->entityInfo->name, offset);
         clang_disposeString(S);
     }
 }
@@ -60,7 +61,7 @@ void ReflectionInfoCollector::OnDeclField(const CXIdxDeclInfo *declInfo) {
 bool ReflectionInfoCollector::HasReflectionAttribute(const CXIdxDeclInfo *declInfo) {
     for (unsigned i = 0; i < declInfo->numAttributes; i++) {
         CXString S = clang_getCursorSpelling(declInfo->attributes[i]->cursor);
-        int cmp = strcmp(clang_getCString(S), ReflectionInfoCollector::AttributeReflection);
+        int cmp = strcmp(clang_getCString(S), AnnotationReflect);
         clang_disposeString(S);
         if (cmp == 0)
             return true;
@@ -68,7 +69,7 @@ bool ReflectionInfoCollector::HasReflectionAttribute(const CXIdxDeclInfo *declIn
     return false;
 }
 
-CXType ReflectionInfoCollector::GetType(const CXCursor cursor) {
+CXType ReflectionInfoCollector::GetUnderlyingType(const CXCursor &cursor) {
     CXType type = clang_getCursorType(cursor);
     while (type.kind == CXType_Typedef) {
         type = clang_getTypedefDeclUnderlyingType(clang_getTypeDeclaration(type));
