@@ -40,7 +40,6 @@
 
 ```
 D:\Program Files\LLVM\bin
-D:\Program Files\LLVM\lib
 ```
 
 **3. 修改源文件根目录下的 CMakeLists.txt**
