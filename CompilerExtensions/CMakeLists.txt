@@ -1,5 +1,7 @@
-add_subdirectory(CodeGen)
+#add_subdirectory(CodeGen)
 
+include_directories(${LLVM_DIR}/include)
+add_executable(EHT EngineHeaderTool.cpp Parser.cpp)
 
-add_executable(EHT EngineHeaderTool.cpp Parser.cpp tools.cpp)
-target_link_libraries(EHT Util xml2 ${LLVM_LIBRARY_DIRS}/libclang.dylib)
+target_link_directories(EHT PRIVATE ${LLVM_DIR}/lib)
+target_link_libraries(EHT Util libclang)

@@ -1,9 +1,7 @@
-#include "event2/event.h"
 //#include "Log.h"
 #include "Network.h"
 
-
-int main(){
+int main() {
 
     return 0;
 }

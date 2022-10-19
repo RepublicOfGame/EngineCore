@@ -1,15 +1,13 @@
 #include "Log.h"
 #include "Parser.h"
-#include "Class.h"
-
 
 int main() {
-//    auto func = &Class::func;
-//    Class c;
-//    c.CallFunction(func, 1);
-//    auto consumer = std::make_shared<ReflectionInfoCollector>();
-//    ParseSourceCode(ENGINE_SOURCE_DIR"/CompilerExtensions/play.cpp", consumer.get());
-
+    //    auto func = &Class::func;
+    //    Class c;
+    //    c.CallFunction(func, 1);
+    auto consumer = std::make_shared<ReflectionInfoCollector>();
+    ParseSourceCode(ENGINE_SOURCE_DIR "/CompilerExtensions/play.cpp",
+                    consumer.get());
 }
 
 //void PrintCursor(CXCursor Cursor, const char *CommentSchemaFile);
