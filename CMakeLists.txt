@@ -26,6 +26,7 @@ file(GLOB_RECURSE CPP_SOURCES RELATIVE ${CMAKE_SOURCE_DIR}
         "Core/*.cpp")
 
 include_directories(
+        ${CMAKE_SOURCE_DIR}/Core/Reflect/Public
         ${CMAKE_SOURCE_DIR}/Core/Net/Public
         ${CMAKE_SOURCE_DIR}/Util/Public
 )
