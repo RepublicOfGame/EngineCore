@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.21)
 project(EngineCore)
 include(FetchContent)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 #add_compile_options(-v)
 add_compile_definitions(ENGINE_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
 
@@ -20,10 +20,6 @@ ELSEIF (APPLE OR UNIX)
     SET(OPENSSL_ROOT_DIR /usr/local/opt/openssl)
     SET(OPENSSL_LIBRARIES /usr/local/opt/openssl/lib)
 ENDIF ()
-
-file(GLOB_RECURSE CPP_SOURCES RELATIVE ${CMAKE_SOURCE_DIR}
-        "Application/*.cpp"
-        "Core/*.cpp")
 
 include_directories(
         ${CMAKE_SOURCE_DIR}/Core/Reflect/Public
@@ -64,11 +60,15 @@ include_directories(${spdlog_SOURCE_DIR}/include/)
 
 add_subdirectory(Util)
 
+# Engine Core
+add_subdirectory(Runtime)
+
 # Compiler Extensions
 add_subdirectory(CompilerExtensions)
 
 # 主程序
-add_executable(EngineCore ${CPP_SOURCES})
+include_directories(Runtime)
+add_subdirectory(Application)
 
 # Unit Test
 file(GLOB_RECURSE CPP_TEST_SOURCES RELATIVE ${CMAKE_SOURCE_DIR}

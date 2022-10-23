@@ -4,15 +4,38 @@
 
 static IndexerCallbacks cb;
 
-void ParseSourceCode(const std::string &filepath, ClangAstConsumer *consumer) {
+std::string ToString(CXString InString) {
+  std::string S(clang_getCString(InString));
+  clang_disposeString(InString);
+  return S;
+}
+
+void ParseSourceCode(std::filesystem::path &Path, ClangAstConsumer *consumer) {
+  std::string filepath = Path.string();
+
   CXIndex index = clang_createIndex(0, 0);
+  const char *commandLineArgs[] = {"-x", "c++", 0};
   CXTranslationUnit TU = clang_parseTranslationUnit(
-      index, filepath.c_str(), nullptr, 0,
-      nullptr, 0, CXTranslationUnit_None);
+      index, filepath.c_str(), commandLineArgs,
+      (sizeof commandLineArgs / sizeof *commandLineArgs) - 1, nullptr, 0,
+      CXTranslationUnit_None);
   if (TU == nullptr) {
     Loge("Failed to parse translation unit file: {}", filepath);
     exit(-1);
   }
+  //  // 一阶段: 预处理解析
+  //  CXCursor cursor = clang_getTranslationUnitCursor(TU);
+  //  clang_visitChildren(
+  //      cursor,
+  //      [](CXCursor c, CXCursor parent, CXClientData clientData) {
+  //        printf("[STEP1]: %s %s\n",
+  //               ToString(clang_getCursorKindSpelling(c.kind)).c_str(),
+  //               ToString(clang_getCursorDisplayName(c)).c_str());
+  //
+  //        return CXChildVisit_Recurse;
+  //      },
+  //      nullptr);
+
   CXIndexAction idxAction = clang_IndexAction_create(index);
   cb.indexDeclaration = [](CXClientData client_data,
                            const CXIdxDeclInfo *info) {
@@ -29,15 +52,14 @@ void ParseSourceCode(const std::string &filepath, ClangAstConsumer *consumer) {
 }
 
 void ClangAstConsumer::OnIndexDeclaration(const CXIdxDeclInfo *declInfo) {
-  //  printf("[INFO] %d\n", clang_getCursorKind(declInfo->cursor));
-  if (const CXIdxCXXClassDeclInfo *classInfo =
+  printf("[INFO] %s\n",
+         ToString(clang_getCursorKindSpelling(declInfo->cursor.kind)).c_str());
+  if (const CXIdxCXXClassDeclInfo *ClassInfo =
           clang_index_getCXXClassDeclInfo(declInfo))
-    this->OnDeclClass(classInfo);
-  else if (clang_getCursorKind(declInfo->cursor) == CXCursor_FieldDecl &&
-           clang_Cursor_hasAttrs(declInfo->cursor))
+    this->OnDeclClass(ClassInfo);
+  else if (clang_getCursorKind(declInfo->cursor) == CXCursor_FieldDecl)
     this->OnDeclField(declInfo);
-  else if (clang_getCursorKind(declInfo->cursor) == CXCursor_CXXMethod &&
-           clang_Cursor_hasAttrs(declInfo->cursor)) {
+  else if (clang_getCursorKind(declInfo->cursor) == CXCursor_CXXMethod) {
     this->OnDeclMethod(declInfo);
   }
 }
@@ -67,9 +89,11 @@ void ReflectionInfoCollector::OnDeclField(const CXIdxDeclInfo *declInfo) {
 }
 
 void ReflectionInfoCollector::OnDeclMethod(const CXIdxDeclInfo *declInfo) {
+  CXType ResultType = clang_getCursorResultType(declInfo->cursor);
+  const char *FunctionName = declInfo->entityInfo->name;
+
   if (HasAttribute(declInfo, ANFUNCTION)) {
-    CXString SR =
-        clang_getTypeSpelling(clang_getCursorResultType(declInfo->cursor));
+    CXString SR = clang_getTypeSpelling(ResultType);
     printf("[Method] Name: %-10s Ret: %-10s", declInfo->entityInfo->name,
            clang_getCString(SR));
     clang_disposeString(SR);
@@ -83,6 +107,12 @@ void ReflectionInfoCollector::OnDeclMethod(const CXIdxDeclInfo *declInfo) {
       clang_disposeString(S);
       clang_disposeString(ST);
     }
+  } else if (strcmp(FunctionName, "GENERATED_BODY") == 0) {
+    unsigned line;
+    clang_getExpansionLocation(clang_getCursorLocation(declInfo->cursor),
+                               nullptr, &line, nullptr, nullptr);
+    Generator->AddGeneratedBody(line);
+    printf("[GENERATED_BODY] line: %d", line);
   }
 }
 

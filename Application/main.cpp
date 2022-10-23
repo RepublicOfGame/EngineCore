@@ -1,7 +1,3 @@
-//#include "Log.h"
-#include "Network.h"
+// #include "Log.h"
 
-int main() {
-
-    return 0;
-}
+int main() { return 0; }

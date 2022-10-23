@@ -1,7 +1,9 @@
 #pragma once
 
+#include "CodeGenerator.h"
 #include "ResourceID.h"
 #include <clang-c/Index.h>
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <vector>
@@ -39,6 +41,9 @@ public:
   static constexpr const char *ANFUNCTION = "NFUNCTION";
   static constexpr const char *ANPROPERTY = "NPROPERTY";
   static constexpr const char *ANCLASS = "NCLASS";
+  CodeGenerator *Generator;
+
+  ReflectionInfoCollector(CodeGenerator *generator) : Generator(generator) {}
 
   void OnDeclClass(const CXIdxCXXClassDeclInfo *ptr) override;
 
@@ -57,5 +62,5 @@ enum Annotation {
   CLASS = StringToRID(ReflectionInfoCollector::ANCLASS)
 };
 
-extern void ParseSourceCode(const std::string &filepath,
+extern void ParseSourceCode(std::filesystem::path &Path,
                             ClangAstConsumer *consumer);

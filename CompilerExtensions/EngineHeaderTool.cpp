@@ -1,65 +1,73 @@
+#include "CodeGenerator.h"
 #include "Log.h"
 #include "Parser.h"
+#include <filesystem>
 
 int main() {
-    //    auto func = &Class::func;
-    //    Class c;
-    //    c.CallFunction(func, 1);
-    auto consumer = std::make_shared<ReflectionInfoCollector>();
-    ParseSourceCode(ENGINE_SOURCE_DIR "/CompilerExtensions/play.cpp",
-                    consumer.get());
+
+  //    auto func = &Class::func;
+  //    Class c;
+  //    c.CallFunction(func, 1);
+  std::filesystem::path sourceCodePath(ENGINE_SOURCE_DIR
+                                       "/Application/MyTestClass.h");
+
+  CodeGenerator generator(sourceCodePath);
+  auto consumer = std::make_shared<ReflectionInfoCollector>(&generator);
+  ParseSourceCode(sourceCodePath, consumer.get());
+
+  generator.Write();
 }
 
-//void PrintCursor(CXCursor Cursor, const char *CommentSchemaFile);
-//void printEntityInfo(const char *cb,
-//                     CXClientData client_data,
-//                     const CXIdxEntityInfo *info);
-//void printCXIndexLoc(CXIdxLoc loc, CXClientData client_data);
+// void PrintCursor(CXCursor Cursor, const char *CommentSchemaFile);
+// void printEntityInfo(const char *cb,
+//                      CXClientData client_data,
+//                      const CXIdxEntityInfo *info);
+// void printCXIndexLoc(CXIdxLoc loc, CXClientData client_data);
 //
 //
 //
-//static CXString createCXString(const char *CS) {
-//    CXString Str;
-//    Str.data = (const void *) CS;
-//    Str.private_flags = 0;
-//    return Str;
-//}
+// static CXString createCXString(const char *CS) {
+//     CXString Str;
+//     Str.data = (const void *) CS;
+//     Str.private_flags = 0;
+//     return Str;
+// }
 //
 //
-//static void printBaseClassInfo(CXClientData client_data,
-//                               const CXIdxBaseClassInfo *info) {
-//    printEntityInfo("<base>", client_data, info->base);
-//    printf(" | cursor: ");
-//    PrintCursor(info->cursor, NULL);
-//    printf(" | loc: ");
-//    printCXIndexLoc(info->loc, client_data);
-//}
+// static void printBaseClassInfo(CXClientData client_data,
+//                                const CXIdxBaseClassInfo *info) {
+//     printEntityInfo("<base>", client_data, info->base);
+//     printf(" | cursor: ");
+//     PrintCursor(info->cursor, NULL);
+//     printf(" | loc: ");
+//     printCXIndexLoc(info->loc, client_data);
+// }
 //
-//static void index_indexDeclaration(CXClientData client_data,
-//                                   const CXIdxDeclInfo *info) {
-//    const CXIdxCXXClassDeclInfo *CXXClassInfo;
-//    if ((CXXClassInfo = clang_index_getCXXClassDeclInfo(info))) {
-//        for (int i = 0; i != CXXClassInfo->numBases; ++i) {
-//            printBaseClassInfo(client_data, CXXClassInfo->bases[i]);
-//            printf("\n");
-//        }
-//    }
+// static void index_indexDeclaration(CXClientData client_data,
+//                                    const CXIdxDeclInfo *info) {
+//     const CXIdxCXXClassDeclInfo *CXXClassInfo;
+//     if ((CXXClassInfo = clang_index_getCXXClassDeclInfo(info))) {
+//         for (int i = 0; i != CXXClassInfo->numBases; ++i) {
+//             printBaseClassInfo(client_data, CXXClassInfo->bases[i]);
+//             printf("\n");
+//         }
+//     }
 //
-//}
-//static IndexerCallbacks IndexCB = {
-//        nullptr,
-//        nullptr,
-//        nullptr,
-//        nullptr,
-//        nullptr,
-//        nullptr,
-//        index_indexDeclaration,
-//        nullptr,
-//};
+// }
+// static IndexerCallbacks IndexCB = {
+//         nullptr,
+//         nullptr,
+//         nullptr,
+//         nullptr,
+//         nullptr,
+//         nullptr,
+//         index_indexDeclaration,
+//         nullptr,
+// };
 //
 //
 //
-//int main(){
+// int main(){
 //
 ////    const char* filename = ENGINE_SOURCE_DIR"/CompilerExtensions/play.cpp";
 ////    CXIndex index = clang_createIndex(0, 0);
@@ -86,14 +94,18 @@ int main() {
 ////    CXCursor cursor = clang_getTranslationUnitCursor(TU);
 //
 //    // 遍历AST
-////    clang_visitChildren(cursor, [](CXCursor c, CXCursor parent, CXClientData clientData){
+////    clang_visitChildren(cursor, [](CXCursor c, CXCursor parent, CXClientData
+/// clientData){
 ////
 //////        if(clang_getCursorKind(c) == CXCursor_AnnotateAttr &&
 //////        toString(clang_getCursorSpelling(c)) == "reflect" &&
 //////                clang_getCursorKind(parent) == CXCursor_FieldDecl){
-//////            printf("Name:%-20s Kind:%-20s Type:%-20s\n", toString(clang_getCursorSpelling(parent)).c_str(),
-//////                   toString(clang_getCursorKindSpelling(clang_getCursorKind(parent))).c_str(),
-//////                   toString(clang_getTypeSpelling(clang_getTypedefDeclUnderlyingType(parent))).c_str());
+//////            printf("Name:%-20s Kind:%-20s Type:%-20s\n",
+/// toString(clang_getCursorSpelling(parent)).c_str(),
+//////
+/// toString(clang_getCursorKindSpelling(clang_getCursorKind(parent))).c_str(),
+//////
+/// toString(clang_getTypeSpelling(clang_getTypedefDeclUnderlyingType(parent))).c_str());
 //////        }
 //////        printf("Parent: ");
 //////        PrintCursor(parent, nullptr);
